@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="800">
+<rect width="100%" height="100%" fill="#211820"/>
+<text x="50%" y="48%" fill="#e9cbd2" font-family="Georgia" font-size="34" text-anchor="middle">Your photo goes here</text>
+<text x="50%" y="54%" fill="#a99aa1" font-family="Georgia" font-size="22" text-anchor="middle">replace this file</text>
+</svg>

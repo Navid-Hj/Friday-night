@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>A Very Important PooPoo Website</title>
+<style>
+  :root{
+    --bg:#0d0c10; --card:#17151c; --cream:#f4eadb; --muted:#aaa0a8;
+    --pink:#f2a7b5; --pink2:#d97991; --line:#302a34;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0; min-height:100vh; background:radial-gradient(circle at 50% 20%,#211820 0%,var(--bg) 52%);
+    color:var(--cream); font-family:Georgia, "Times New Roman", serif; overflow:hidden;
+  }
+  button,input{font:inherit}
+  .screen{position:fixed; inset:0; display:flex; align-items:center; justify-content:center; padding:24px;
+    opacity:0; pointer-events:none; transform:translateY(12px); transition:.65s ease}
+  .screen.active{opacity:1; pointer-events:auto; transform:none}
+  .panel{width:min(620px,94vw); text-align:center}
+  .photo{
+    width:min(340px,78vw); aspect-ratio:1/1; margin:0 auto 28px; border:1px solid #4a3b44;
+    border-radius:18px; overflow:hidden; background:linear-gradient(135deg,#30222a,#17151b);
+    box-shadow:0 20px 70px #0008; display:flex; align-items:center; justify-content:center; color:#bbaeb4;
+  }
+  .photo img{width:100%;height:100%;object-fit:cover;display:block}
+  .eyebrow{font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--pink);margin-bottom:14px}
+  h1{font-size:clamp(32px,7vw,58px);font-weight:400;margin:0 0 14px;line-height:1.05}
+  h2{font-size:clamp(28px,6vw,46px);font-weight:400;margin:0 0 14px}
+  p{font-size:18px;line-height:1.6;color:#d6ccd2;margin:8px 0}
+  .small{font-size:14px;color:var(--muted)}
+  .input-wrap{margin:28px auto 12px;max-width:420px}
+  input{
+    width:100%; padding:16px 18px; background:#100e13; color:var(--cream); border:1px solid #58404a;
+    border-radius:12px; outline:none; text-align:center; box-shadow:0 0 0 0 #f2a7b500; transition:.2s
+  }
+  input:focus{border-color:var(--pink);box-shadow:0 0 0 4px #f2a7b514}
+  .btn{
+    border:1px solid #674552;background:#21171d;color:var(--cream);padding:13px 22px;border-radius:999px;
+    cursor:pointer;transition:.2s;margin:6px
+  }
+  .btn:hover{transform:translateY(-2px);background:#2b1c24;border-color:var(--pink)}
+  .btn.yes{background:var(--pink);color:#24151a;border-color:var(--pink)}
+  .error{min-height:24px;color:#f49aaa;font-size:14px}
+  .progress{height:5px;width:min(430px,80vw);background:#2a252b;border-radius:99px;margin:22px auto;overflow:hidden}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--pink2),var(--pink));transition:1.5s cubic-bezier(.2,.8,.2,1)}
+  .choice-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;margin-top:28px}
+  .choice{
+    padding:22px 14px;border:1px solid var(--line);background:#151319;border-radius:18px;cursor:pointer;
+    transition:.25s;text-align:left
+  }
+  .choice:hover{transform:translateY(-4px);border-color:#8d5a69;background:#1d1820}
+  .choice strong{display:block;font-size:21px;font-weight:400;margin-bottom:6px}
+  .choice span{font-size:14px;color:var(--muted)}
+  .result{min-height:70px;margin-top:20px}
+  .book-scene{position:relative;width:min(900px,94vw);height:min(620px,82vh);display:flex;align-items:center;justify-content:center}
+  .book{
+    width:min(820px,94vw);height:min(540px,75vh);position:relative;perspective:1800px;
+    filter:drop-shadow(0 25px 35px #0009)
+  }
+  .cover{
+    position:absolute;inset:0;background:linear-gradient(135deg,#1a1517,#0e0c0e);border:1px solid #4b3b3e;
+    border-radius:7px 14px 14px 7px;display:flex;align-items:center;justify-content:center;flex-direction:column;
+    transform-origin:left center;transition:1.2s cubic-bezier(.2,.7,.1,1);z-index:5;cursor:pointer
+  }
+  .cover.open{transform:rotateY(-145deg);pointer-events:none}
+  .cover-title{font-size:45px;color:#eadbc7}.cover-sub{margin-top:8px;color:#bfaeaa}
+  .spread{
+    position:absolute;inset:0;background:#e9dcc8;color:#30272a;border-radius:8px;
+    display:grid;grid-template-columns:1fr 1fr;overflow:hidden
+  }
+  .page{position:relative;padding:34px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .page:first-child{border-right:1px solid #c8b8a1}
+  .page img{max-width:100%;max-height:90%;object-fit:cover;box-shadow:0 8px 22px #33241435}
+  .caption{position:absolute;left:32px;bottom:18px;font-style:italic;font-size:15px;opacity:.8}
+  .book-nav{position:absolute;bottom:-5px;left:0;right:0;display:flex;justify-content:center;gap:18px;z-index:10}
+  .navbtn{width:46px;height:46px;border-radius:50%;border:1px solid #6a5a60;background:#18151a;color:#fff;cursor:pointer}
+  .page-count{color:#c9bcc0;font-size:13px;align-self:center}
+  .bear{font-size:110px;line-height:1;animation:float 3s ease-in-out infinite}
+  .bearline{font-size:70px}
+  @keyframes float{50%{transform:translateY(-8px)}}
+  .toast{position:fixed;left:50%;bottom:25px;transform:translate(-50%,20px);opacity:0;background:#201820;
+    border:1px solid #654754;color:#f3dbe1;padding:12px 18px;border-radius:999px;transition:.3s;z-index:20}
+  .toast.show{opacity:1;transform:translate(-50%,0)}
+  @media(max-width:650px){
+    .choice-grid{grid-template-columns:1fr}
+    .book{height:520px}
+    .spread{grid-template-columns:1fr}
+    .page:first-child{display:none}
+    .page{padding:24px}
+  }
+</style>
+</head>
+<body>
+
+<div class="screen active" id="s1">
+  <div class="panel">
+    <div class="photo"><img src="assets/photo1.jpg" alt="Your first photo together" onerror="this.style.display='none';this.parentElement.innerHTML='<span>Put your first photo here<br><small>assets/photo1.jpg</small></span>'"></div>
+    <div class="eyebrow">Very serious verification</div>
+    <h1>Loading...</h1>
+    <p id="loadingText">Doing some very important PooPoo business.</p>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+    <p><b>Quick question:</b><br>Who is PooPoo's favourite person?</p>
+    <div class="input-wrap"><input id="nameInput" autocomplete="off" placeholder="Type your answer"></div>
+    <button class="btn yes" id="enterBtn">Enter</button>
+    <div class="error" id="nameError"></div>
+  </div>
+</div>
+
+<div class="screen" id="s2">
+  <div class="panel">
+    <div class="eyebrow">Okay Saina</div>
+    <h2>One more question.</h2>
+    <p style="font-size:22px;margin-top:22px">Will you go on a date with PooPoo this Friday? 👀</p>
+    <div style="margin-top:28px">
+      <button class="btn yes" id="yesBtn">YES ❤️</button>
+      <button class="btn" id="noBtn">NO</button>
+    </div>
+    <div class="photo" id="wrongPhoto" style="display:none;margin-top:26px;width:220px">
+      <img src="assets/poopoo_wrong.jpg" alt="PooPoo looking disappointed" onerror="this.style.display='none';this.parentElement.innerHTML='<span>Put a funny PooPoo photo here<br><small>assets/poopoo_wrong.jpg</small></span>'">
+    </div>
+    <p class="error" id="dateError"></p>
+  </div>
+</div>
+
+<div class="screen" id="s3">
+  <div class="panel">
+    <div class="eyebrow">Date unlocked</div>
+    <h2>Okay, we're doing this.</h2>
+    <p>So... what are we doing?</p>
+    <div class="choice-grid">
+      <div class="choice" data-choice="Bowling"><strong>🎳 Bowling</strong><span>Just so we're clear, I'm winning.</span></div>
+      <div class="choice" data-choice="Playland"><strong>🛝 Playland</strong><span>Honestly, I'm not complaining.</span></div>
+      <div class="choice" data-choice="Food"><strong>🍽️ Get food</strong><span>Good choice. I was getting hungry anyway.</span></div>
+      <div class="choice" data-choice="Explore"><strong>🌃 Go somewhere</strong><span>No plan? Probably more our style.</span></div>
+    </div>
+    <div class="result" id="choiceResult"></div>
+  </div>
+</div>
+
+<div class="screen" id="s4">
+  <div class="book-scene">
+    <div class="book">
+      <div class="spread">
+        <div class="page"><img id="leftImg" src="assets/photo2.jpg" alt="Memory"></div>
+        <div class="page"><img id="rightImg" src="assets/photo3.jpg" alt="Memory"><div class="caption" id="caption">A pretty good day.</div></div>
+      </div>
+      <div class="cover" id="cover">
+        <div class="cover-title">Our little book</div>
+        <div class="cover-sub">click to open ♡</div>
+      </div>
+    </div>
+    <div class="book-nav">
+      <button class="navbtn" id="prev">←</button>
+      <span class="page-count" id="pageCount">1 / 6</span>
+      <button class="navbtn" id="next">→</button>
+    </div>
+  </div>
+</div>
+
+<div class="screen" id="s5">
+  <div class="panel">
+    <div class="eyebrow">The end</div>
+    <div class="bear">🧸</div>
+    <div style="font-size:70px;margin-top:-20px">🫂</div>
+    <h2 style="margin-top:5px">Thanks for going on a date with me ❤️</h2>
+    <p>See you Friday, Saina.</p>
+    <button class="btn yes" onclick="location.reload()">Read it again</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const screens=[1,2,3,4,5].map(n=>document.getElementById('s'+n));
+function go(n){screens.forEach(s=>s.classList.remove('active'));document.getElementById('s'+n).classList.add('active')}
+setTimeout(()=>document.getElementById('bar').style.width='82%',250);
+
+document.getElementById('enterBtn').onclick=()=>{
+  const v=document.getElementById('nameInput').value.trim().toLowerCase();
+  if(v==='saina'){
+    document.getElementById('bar').style.width='100%';
+    document.getElementById('loadingText').textContent='Identity confirmed. ♡';
+    setTimeout(()=>go(2),900);
+  }else{
+    document.getElementById('nameError').textContent='Nope 😂 Try again.';
+    document.getElementById('bar').style.width='55%';
+  }
+};
+document.getElementById('nameInput').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('enterBtn').click()});
+
+let noCount=0;
+document.getElementById('noBtn').onclick=()=>{
+  noCount++;
+  document.getElementById('wrongPhoto').style.display='flex';
+  document.getElementById('dateError').textContent=noCount>2?'Okay, PooPoo is starting to take this personally. 😐':'Wrong answer 😂 Try again.';
+};
+
+document.getElementById('yesBtn').onclick=()=>go(3);
+
+const responses={
+  Bowling:'Bowling it is 🎳 I hope you enjoy losing.',
+  Playland:'Playland it is 😂 Honestly, I respect the choice.',
+  Food:'Food. Excellent. I was getting hungry anyway.',
+  Explore:'No plan? Probably more our style anyway.'
+};
+document.querySelectorAll('.choice').forEach(c=>c.onclick=()=>{
+  document.getElementById('choiceResult').innerHTML='<p>'+responses[c.dataset.choice]+'</p><button class="btn yes" id="bookBtn">Okay, continue →</button>';
+  document.getElementById('bookBtn').onclick=()=>go(4);
+});
+
+const pages=[
+  ['assets/photo2.jpg','assets/photo3.jpg','A pretty good day.'],
+  ['assets/photo4.jpg','assets/photo5.jpg','We look pretty good here ngl.'],
+  ['assets/photo6.jpg','assets/photo7.jpg','This one is still one of my favourites.'],
+  ['assets/photo8.jpg','assets/photo9.jpg','Okay, this was actually a really good day.'],
+  ['assets/photo10.jpg','assets/photo11.jpg','I really like this one. ❤️'],
+  ['assets/photo12.jpg','assets/photo12.jpg','See you Friday.']
+];
+let page=0;
+document.getElementById('cover').onclick=()=>document.getElementById('cover').classList.add('open');
+function renderPage(){
+  const p=pages[page];
+  document.getElementById('leftImg').src=p[0];
+  document.getElementById('rightImg').src=p[1];
+  document.getElementById('caption').textContent=p[2];
+  document.getElementById('pageCount').textContent=(page+1)+' / '+pages.length;
+}
+document.getElementById('prev').onclick=()=>{if(page>0){page--;renderPage()}};
+document.getElementById('next').onclick=()=>{if(page<pages.length-1){page++;renderPage()}else{go(5)}};
+renderPage();
+</script>
+</body>
+</html>
